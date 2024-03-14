@@ -9,13 +9,13 @@ const db = mysql.createConnection({
     password: "",
     database: "swapi"
 })
-/*app.use(cors({
+app.use(cors({
     origin: 'http://localhost:3000'
-}))*/
+}))
 app.use(express.json())
 
 app.get("/planets",(req,res)=>{
-    db.query('SELECT * FROM planets', (err, result)=>{
+    db.query('SELECT * FROM planets WHERE NAME != ?',('unknown'), (err, result)=>{
         if(err){
             console.error(err)
         }else{
@@ -53,6 +53,7 @@ app.get("/people",(req,res)=>{
     })
 
 })
+
 app.get("/starships",(req,res)=>{
     db.query('SELECT * FROM starships', (err, result)=>{
         if(err){
@@ -71,9 +72,12 @@ app.get("/starships",(req,res)=>{
                             obj["MGLT"] = handlerShip[0].MGLT
                             obj["starship_class"] = handlerShip[0].starship_class
                             obj["hyperdrive_rating"] = handlerShip[0].hyperdrive_rating
-                        } else{}
-                        return obj
+                            return obj
+                        } else{
+                            return undefined
+                        }
                     })
+                    merged = merged.filter((m)=> m!==undefined)
                     res.send(merged)
                 }
             })
